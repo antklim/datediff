@@ -170,3 +170,37 @@ func (d Diff) String() string {
 func (d Diff) StringWithZeros() string {
 	return formatWithZeros(d, d.rawFormat)
 }
+
+func fullYearsDiff(start, end time.Time) (years int) {
+	years = end.Year() - start.Year()
+	if start.AddDate(years, 0, 0).After(end) {
+		years--
+	}
+	return
+}
+
+func fullMonthsDiff(start, end time.Time) (months int) {
+	for start.AddDate(0, months+1, 0).Before(end) ||
+		start.AddDate(0, months+1, 0).Equal(end) {
+		months++
+	}
+	return
+}
+
+func fullWeeksDiff(start, end time.Time) (weeks int) {
+	days := daysInWeek
+	for start.AddDate(0, 0, days).Before(end) ||
+		start.AddDate(0, 0, days).Equal(end) {
+		weeks++
+		days += daysInWeek
+	}
+	return
+}
+
+func fullDaysDiff(start, end time.Time) (days int) {
+	for start.AddDate(0, 0, days+1).Before(end) ||
+		start.AddDate(0, 0, days+1).Equal(end) {
+		days++
+	}
+	return
+}
