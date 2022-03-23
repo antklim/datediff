@@ -1,0 +1,64 @@
+# start,end,format,years,months,weeks,days,print,printWzeros
+2000-04-17,2003-03-16,%Y,2,0,0,0,2 years,2 years
+2000-04-17,2003-03-16,%M,0,34,0,0,34 months,34 months
+2000-04-17,2003-03-16,%W,0,0,151,0,151 weeks,151 weeks
+2000-04-17,2003-03-16,%D,0,0,0,1063,1063 days,1063 days
+2000-04-17,2003-03-16,%Y %M,2,10,0,0,2 years 10 months,2 years 10 months
+2000-04-17,2003-03-16,%Y %W,2,0,47,0,2 years 47 weeks,2 years 47 weeks
+2000-04-17,2003-03-16,%Y %D,2,0,0,333,2 years 333 days,2 years 333 days
+2000-04-17,2003-03-16,%M %W,0,34,3,0,34 months 3 weeks,34 months 3 weeks
+2000-04-17,2003-03-16,%M %D,0,34,0,27,34 months 27 days,34 months 27 days
+2000-04-17,2003-03-16,%W %D,0,0,151,6,151 weeks 6 days,151 weeks 6 days
+2000-04-17,2003-03-16,%Y %M %W,2,10,3,0,2 years 10 months 3 weeks,2 years 10 months 3 weeks
+2000-04-17,2003-03-16,%Y %M %D,2,10,0,27,2 years 10 months 27 days,2 years 10 months 27 days
+2000-04-17,2003-03-16,%Y %W %D,2,0,47,4,2 years 47 weeks 4 days,2 years 47 weeks 4 days
+2000-04-17,2003-03-16,%M %W %D,0,34,3,6,34 months 3 weeks 6 days,34 months 3 weeks 6 days
+2000-04-17,2003-03-16,%Y %M %W %D,2,10,3,6,2 years 10 months 3 weeks 6 days,2 years 10 months 3 weeks 6 days
+2000-04-17,2003-04-17,%Y,3,0,0,0,3 years,3 years
+2000-04-17,2003-04-17,%M,0,36,0,0,36 months,36 months
+2000-04-17,2003-04-17,%W,0,0,156,0,156 weeks,156 weeks
+2000-04-17,2003-04-17,%D,0,0,0,1095,1095 days,1095 days
+2000-04-17,2003-04-17,%Y %M,3,0,0,0,3 years,3 years 0 months
+2000-04-17,2003-04-17,%Y %W,3,0,0,0,3 years,3 years 0 weeks
+2000-04-17,2003-04-17,%Y %D,3,0,0,0,3 years,3 years 0 days
+2000-04-17,2003-04-17,%M %W,0,36,0,0,36 months,36 months 0 weeks
+2000-04-17,2003-04-17,%M %D,0,36,0,0,36 months,36 months 0 days
+2000-04-17,2003-04-17,%W %D,0,0,156,3,156 weeks 3 days,156 weeks 3 days
+2000-04-17,2003-04-17,%Y %M %W,3,0,0,0,3 years,3 years 0 months 0 weeks
+2000-04-17,2003-04-17,%Y %M %D,3,0,0,0,3 years,3 years 0 months 0 days
+2000-04-17,2003-04-17,%Y %W %D,3,0,0,0,3 years,3 years 0 weeks 0 days
+2000-04-17,2003-04-17,%M %W %D,0,36,0,0,36 months,36 months 0 weeks 0 days
+2000-04-17,2003-04-17,%Y %M %W %D,3,0,0,0,3 years,3 years 0 months 0 weeks 0 days
+2000-01-01,2010-04-14,%Y %D,10,0,0,103,10 years 103 days,10 years 103 days
+# custom unit names
+2000-04-17,2003-03-16,%y anos,2,0,0,0,2 anos,2 anos
+2000-04-17,2003-03-16,%m meses,0,34,0,0,34 meses,34 meses
+2000-04-17,2003-03-16,%w semanas,0,0,151,0,151 semanas,151 semanas
+2000-04-17,2003-03-16,%d dias,0,0,0,1063,1063 dias,1063 dias
+2000-04-17,2003-03-16,%y anos %m meses,2,10,0,0,2 anos 10 meses,2 anos 10 meses
+2000-04-17,2003-03-16,%y anos %w semanas,2,0,47,0,2 anos 47 semanas,2 anos 47 semanas
+2000-04-17,2003-03-16,%y anos %d dias,2,0,0,333,2 anos 333 dias,2 anos 333 dias
+2000-04-17,2003-03-16,%m meses %w semanas,0,34,3,0,34 meses 3 semanas,34 meses 3 semanas
+2000-04-17,2003-03-16,%m meses %d dias,0,34,0,27,34 meses 27 dias,34 meses 27 dias
+2000-04-17,2003-03-16,%w semanas %d dias,0,0,151,6,151 semanas 6 dias,151 semanas 6 dias
+2000-04-17,2003-03-16,%y anos %m meses %w semanas,2,10,3,0,2 anos 10 meses 3 semanas,2 anos 10 meses 3 semanas
+2000-04-17,2003-03-16,%y anos %m meses %d dias,2,10,0,27,2 anos 10 meses 27 dias,2 anos 10 meses 27 dias
+2000-04-17,2003-03-16,%y anos %w semanas %d dias,2,0,47,4,2 anos 47 semanas 4 dias,2 anos 47 semanas 4 dias
+2000-04-17,2003-03-16,%m meses %w semanas %d dias,0,34,3,6,34 meses 3 semanas 6 dias,34 meses 3 semanas 6 dias
+2000-04-17,2003-03-16,%y anos %m meses %w semanas %d dias,2,10,3,6,2 anos 10 meses 3 semanas 6 dias,2 anos 10 meses 3 semanas 6 dias
+2000-04-17,2003-04-17,%y anos,3,0,0,0,3 anos,3 anos
+2000-04-17,2003-04-17,%m meses,0,36,0,0,36 meses,36 meses
+2000-04-17,2003-04-17,%w semanas,0,0,156,0,156 semanas,156 semanas
+2000-04-17,2003-04-17,%d dias,0,0,0,1095,1095 dias,1095 dias
+2000-04-17,2003-04-17,%y anos %m meses,3,0,0,0,3 anos meses,3 anos 0 meses
+2000-04-17,2003-04-17,%y anos %w semanas,3,0,0,0,3 anos semanas,3 anos 0 semanas
+2000-04-17,2003-04-17,%y anos %d dias,3,0,0,0,3 anos dias,3 anos 0 dias
+2000-04-17,2003-04-17,%m meses %w semanas,0,36,0,0,36 meses semanas,36 meses 0 semanas
+2000-04-17,2003-04-17,%m meses %d dias,0,36,0,0,36 meses dias,36 meses 0 dias
+2000-04-17,2003-04-17,%w semanas %d dias,0,0,156,3,156 semanas 3 dias,156 semanas 3 dias
+2000-04-17,2003-04-17,%y anos %m meses %w semanas,3,0,0,0,3 anos meses semanas,3 anos 0 meses 0 semanas
+2000-04-17,2003-04-17,%y anos %m meses %d dias,3,0,0,0,3 anos meses dias,3 anos 0 meses 0 dias
+2000-04-17,2003-04-17,%y anos %w semanas %d dias,3,0,0,0,3 anos semanas dias,3 anos 0 semanas 0 dias
+2000-04-17,2003-04-17,%m meses %w semanas %d dias,0,36,0,0,36 meses semanas dias,36 meses 0 semanas 0 dias
+2000-04-17,2003-04-17,%y anos %m meses %w semanas %d dias,3,0,0,0,3 anos meses semanas dias,3 anos 0 meses 0 semanas 0 dias
+2000-01-01,2010-04-14,%y anos %d dias,10,0,0,103,10 anos 103 dias,10 anos 103 dias
