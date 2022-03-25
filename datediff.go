@@ -133,6 +133,43 @@ func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 	return diff, nil
 }
 
+func NewDiffWithMode(start, end time.Time, mode DiffMode) (Diff, error) {
+	// TODO: add failures test
+	// if start.After(end) {
+	// 	return Diff{}, errStartIsAfterEnd
+	// }
+
+	diff := Diff{}
+	// TODO: refactor the following part - it repeats NewDiff
+	if mode&ModeYears != 0 {
+		diff.Years = fullYearsDiff(start, end)
+		start = start.AddDate(diff.Years, 0, 0)
+	}
+
+	if mode&ModeMonths != 0 {
+		// getting to the closest year to the end date to reduce
+		// amount of the interations during the full month calculation
+		var years int
+		if mode&ModeYears == 0 {
+			years = fullYearsDiff(start, end)
+		}
+		months := fullMonthsDiff(start.AddDate(years, 0, 0), end)
+		diff.Months = years*monthsInYear + months
+		start = start.AddDate(0, diff.Months, 0)
+	}
+
+	if mode&ModeWeeks != 0 {
+		diff.Weeks = fullWeeksDiff(start, end)
+		start = start.AddDate(0, 0, diff.Weeks*daysInWeek)
+	}
+
+	if mode&ModeDays != 0 {
+		diff.Days = fullDaysDiff(start, end)
+	}
+
+	return diff, nil
+}
+
 // Equal returns true when two dates differences are equal.
 func (d Diff) Equal(other Diff) bool {
 	return d.Years == other.Years &&

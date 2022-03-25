@@ -167,6 +167,27 @@ func TestNewDiffFails(t *testing.T) {
 	}
 }
 
+func TestNewDiffWithMode(t *testing.T) {
+	start, _ := time.Parse("2006-01-02", "2000-04-17")
+	end, _ := time.Parse("2006-01-02", "2003-03-16")
+
+	want := datediff.Diff{
+		Years:  2,
+		Months: 10,
+		Days:   27,
+	}
+	// TODO: add mode to CSV and reuse existing test cases
+	mode := datediff.ModeYears | datediff.ModeMonths | datediff.ModeDays
+	got, err := datediff.NewDiffWithMode(start, end, mode)
+	if err != nil {
+		t.Errorf("NewDiffWithMode(%s, %s, %d) failed: %v",
+			start.Format(dateFmt), end.Format(dateFmt), mode, err)
+	} else if !got.Equal(want) {
+		t.Errorf("NewDiffWithMode(%s, %s, %d) = %v, want %#v",
+			start.Format(dateFmt), end.Format(dateFmt), mode, got, want)
+	}
+}
+
 func TestString(t *testing.T) {
 	testCases, err := loadDatediffRecordsForTest()
 	if err != nil {
