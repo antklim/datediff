@@ -16,17 +16,17 @@ var (
 	errUndefinedDiffMode = errors.New("undefined dates difference mode")
 )
 
-type diffMode uint8
+type DiffMode uint8
 
 const (
-	modeYears diffMode = 1 << (8 - 1 - iota)
-	modeMonths
-	modeWeeks
-	modeDays
+	ModeYears DiffMode = 1 << (8 - 1 - iota)
+	ModeMonths
+	ModeWeeks
+	ModeDays
 )
 
-func unmarshal(rawFormat string) (diffMode, error) {
-	var mode diffMode
+func unmarshal(rawFormat string) (DiffMode, error) {
+	var mode DiffMode
 	end := len(rawFormat)
 	for i := 0; i < end; {
 		for i < end && rawFormat[i] != '%' {
@@ -40,13 +40,13 @@ func unmarshal(rawFormat string) (diffMode, error) {
 		i++
 		switch c := rawFormat[i]; c {
 		case 'Y', 'y':
-			mode |= modeYears
+			mode |= ModeYears
 		case 'M', 'm':
-			mode |= modeMonths
+			mode |= ModeMonths
 		case 'W', 'w':
-			mode |= modeWeeks
+			mode |= ModeWeeks
 		case 'D', 'd':
-			mode |= modeDays
+			mode |= ModeDays
 		default:
 			return 0, fmt.Errorf("format %q has unknown verb %c", rawFormat, c)
 		}
@@ -104,16 +104,16 @@ func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 
 	diff := Diff{rawFormat: rawFormat}
 
-	if mode&modeYears != 0 {
+	if mode&ModeYears != 0 {
 		diff.Years = fullYearsDiff(start, end)
 		start = start.AddDate(diff.Years, 0, 0)
 	}
 
-	if mode&modeMonths != 0 {
+	if mode&ModeMonths != 0 {
 		// getting to the closest year to the end date to reduce
 		// amount of the interations during the full month calculation
 		var years int
-		if mode&modeYears == 0 {
+		if mode&ModeYears == 0 {
 			years = fullYearsDiff(start, end)
 		}
 		months := fullMonthsDiff(start.AddDate(years, 0, 0), end)
@@ -121,12 +121,12 @@ func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 		start = start.AddDate(0, diff.Months, 0)
 	}
 
-	if mode&modeWeeks != 0 {
+	if mode&ModeWeeks != 0 {
 		diff.Weeks = fullWeeksDiff(start, end)
 		start = start.AddDate(0, 0, diff.Weeks*daysInWeek)
 	}
 
-	if mode&modeDays != 0 {
+	if mode&ModeDays != 0 {
 		diff.Days = fullDaysDiff(start, end)
 	}
 
