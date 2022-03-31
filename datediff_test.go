@@ -16,6 +16,7 @@ const dateFmt = "2006-01-02"
 const (
 	startFld = iota
 	endFld
+	modeFld
 	formatFld
 	yearsFld
 	monthsFld
@@ -28,6 +29,7 @@ const (
 type datediffRecord struct {
 	start          time.Time
 	end            time.Time
+	mode           datediff.DiffMode
 	format         string
 	diff           datediff.Diff
 	print          string
@@ -40,6 +42,10 @@ func loadDatediffRecord(r []string) (datediffRecord, error) {
 		return datediffRecord{}, err
 	}
 	end, err := time.Parse(dateFmt, r[endFld])
+	if err != nil {
+		return datediffRecord{}, err
+	}
+	mode, err := strconv.Atoi(r[modeFld])
 	if err != nil {
 		return datediffRecord{}, err
 	}
@@ -63,6 +69,7 @@ func loadDatediffRecord(r []string) (datediffRecord, error) {
 	return datediffRecord{
 		start:          start,
 		end:            end,
+		mode:           datediff.DiffMode(mode),
 		format:         r[formatFld],
 		diff:           datediff.Diff{Years: years, Months: months, Weeks: weeks, Days: days},
 		print:          r[printFld],
