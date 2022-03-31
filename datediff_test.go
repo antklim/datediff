@@ -177,12 +177,27 @@ func TestNewDiffFails(t *testing.T) {
 	for _, tC := range testCases {
 		got, err := datediff.NewDiff(tC.start, tC.end, tC.format)
 		if err == nil {
-			t.Errorf("NewDiff(%s, %s, %s) = %v, want to fail due to %s",
+			t.Errorf("NewDiff(%s, %s, %s) = %#v, want to fail due to %s",
 				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, got, tC.expected)
 		} else if err.Error() != tC.expected {
 			t.Errorf("NewDiff(%s, %s, %s) failed: %v, want to fail due to %s",
 				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, err, tC.expected)
 		}
+	}
+}
+
+func TestNewDiffWithModeFails(t *testing.T) {
+	start := time.Now().Add(time.Hour)
+	end := time.Now()
+	mode := datediff.ModeYears
+	expected := "start date is after end date"
+	got, err := datediff.NewDiffWithMode(start, end, mode)
+	if err == nil {
+		t.Errorf("NewDiffWithMode(%s, %s, %d) = %#v, want to fail due to %s",
+			start.Format(dateFmt), end.Format(dateFmt), mode, got, expected)
+	} else if err.Error() != expected {
+		t.Errorf("NewDiffWithMode(%s, %s, %d) failed: %v, want to fail due to %s",
+			start.Format(dateFmt), end.Format(dateFmt), mode, err, expected)
 	}
 }
 

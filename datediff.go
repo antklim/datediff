@@ -134,10 +134,9 @@ func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 }
 
 func NewDiffWithMode(start, end time.Time, mode DiffMode) (Diff, error) {
-	// TODO: add failures test
-	// if start.After(end) {
-	// 	return Diff{}, errStartIsAfterEnd
-	// }
+	if start.After(end) {
+		return Diff{}, errStartIsAfterEnd
+	}
 
 	diff := Diff{}
 	// TODO: refactor the following part - it repeats NewDiff
