@@ -66,6 +66,7 @@ type Diff struct {
 	Weeks     int
 	Days      int
 	rawFormat string // initial format, i.e "%Y and %M"
+	mode      DiffMode
 }
 
 // NewDiff creates Diff according to the provided format.
@@ -156,7 +157,7 @@ func (d Diff) StringWithZeros() string {
 }
 
 func newDiff(start, end time.Time, mode DiffMode) Diff {
-	diff := Diff{}
+	diff := Diff{mode: mode}
 
 	if mode&ModeYears != 0 {
 		diff.Years = fullYearsDiff(start, end)
