@@ -2,6 +2,7 @@ package datediff_test
 
 import (
 	"encoding/csv"
+	"fmt"
 	"os"
 	"strconv"
 	"testing"
@@ -126,16 +127,26 @@ func TestNewDiff(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// TODO: add t.Run for NewDiff and NewDffWithMode
 	for _, tC := range testCases {
-		got, err := datediff.NewDiff(tC.start, tC.end, tC.format)
-		if err != nil {
-			t.Errorf("NewDiff(%s, %s, %s) failed: %v",
-				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, err)
-		} else if !got.Equal(tC.diff) {
-			t.Errorf("NewDiff(%s, %s, %s) = %v, want %#v",
-				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, got, tC.diff)
-		}
+		desc := fmt.Sprintf("NewDiff(%s, %s, %s)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format)
+		t.Run(desc, func(t *testing.T) {
+			got, err := datediff.NewDiff(tC.start, tC.end, tC.format)
+			if err != nil {
+				t.Errorf("failed: %v", err)
+			} else if !got.Equal(tC.diff) {
+				t.Errorf("got %#v, want %#v", got, tC.diff)
+			}
+		})
+
+		desc = fmt.Sprintf("NewDiffWithMode(%s, %s, %d)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.mode)
+		t.Run(desc, func(t *testing.T) {
+			got, err := datediff.NewDiffWithMode(tC.start, tC.end, tC.mode)
+			if err != nil {
+				t.Errorf("failed: %v", err)
+			} else if !got.Equal(tC.diff) {
+				t.Errorf("got %#v, want %#v", got, tC.diff)
+			}
+		})
 	}
 }
 
@@ -172,27 +183,6 @@ func TestNewDiffFails(t *testing.T) {
 			t.Errorf("NewDiff(%s, %s, %s) failed: %v, want to fail due to %s",
 				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, err, tC.expected)
 		}
-	}
-}
-
-func TestNewDiffWithMode(t *testing.T) {
-	start, _ := time.Parse("2006-01-02", "2000-04-17")
-	end, _ := time.Parse("2006-01-02", "2003-03-16")
-
-	want := datediff.Diff{
-		Years:  2,
-		Months: 10,
-		Days:   27,
-	}
-	// TODO: add mode to CSV and reuse existing test cases
-	mode := datediff.ModeYears | datediff.ModeMonths | datediff.ModeDays
-	got, err := datediff.NewDiffWithMode(start, end, mode)
-	if err != nil {
-		t.Errorf("NewDiffWithMode(%s, %s, %d) failed: %v",
-			start.Format(dateFmt), end.Format(dateFmt), mode, err)
-	} else if !got.Equal(want) {
-		t.Errorf("NewDiffWithMode(%s, %s, %d) = %v, want %#v",
-			start.Format(dateFmt), end.Format(dateFmt), mode, got, want)
 	}
 }
 
