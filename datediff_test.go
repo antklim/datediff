@@ -119,6 +119,7 @@ func TestNewDiff(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// TODO: add t.Run for NewDiff and NewDffWithMode
 	for _, tC := range testCases {
 		got, err := datediff.NewDiff(tC.start, tC.end, tC.format)
 		if err != nil {
@@ -194,6 +195,7 @@ func TestString(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// TODO: add t.Run for NewDiff and NewDiffWithMode
 	for _, tC := range testCases {
 		diff, err := datediff.NewDiff(tC.start, tC.end, tC.format)
 		if err != nil {

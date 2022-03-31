@@ -199,6 +199,7 @@ func (d Diff) FormatWithZeros(rawFormat string) (string, error) {
 // String formats dates difference according to the format provided at
 // initialization of dates difference. Time units that have 0 value omitted.
 func (d Diff) String() string {
+	// TODO: print using modes
 	return format(d, d.rawFormat)
 }
 
