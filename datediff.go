@@ -102,33 +102,8 @@ func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 		return Diff{}, err
 	}
 
-	diff := Diff{rawFormat: rawFormat}
-
-	if mode&ModeYears != 0 {
-		diff.Years = fullYearsDiff(start, end)
-		start = start.AddDate(diff.Years, 0, 0)
-	}
-
-	if mode&ModeMonths != 0 {
-		// getting to the closest year to the end date to reduce
-		// amount of the interations during the full month calculation
-		var years int
-		if mode&ModeYears == 0 {
-			years = fullYearsDiff(start, end)
-		}
-		months := fullMonthsDiff(start.AddDate(years, 0, 0), end)
-		diff.Months = years*monthsInYear + months
-		start = start.AddDate(0, diff.Months, 0)
-	}
-
-	if mode&ModeWeeks != 0 {
-		diff.Weeks = fullWeeksDiff(start, end)
-		start = start.AddDate(0, 0, diff.Weeks*daysInWeek)
-	}
-
-	if mode&ModeDays != 0 {
-		diff.Days = fullDaysDiff(start, end)
-	}
+	diff := newDiff(start, end, mode)
+	diff.rawFormat = rawFormat
 
 	return diff, nil
 }
@@ -137,35 +112,7 @@ func NewDiffWithMode(start, end time.Time, mode DiffMode) (Diff, error) {
 	if start.After(end) {
 		return Diff{}, errStartIsAfterEnd
 	}
-
-	diff := Diff{}
-	// TODO: refactor the following part - it repeats NewDiff
-	if mode&ModeYears != 0 {
-		diff.Years = fullYearsDiff(start, end)
-		start = start.AddDate(diff.Years, 0, 0)
-	}
-
-	if mode&ModeMonths != 0 {
-		// getting to the closest year to the end date to reduce
-		// amount of the interations during the full month calculation
-		var years int
-		if mode&ModeYears == 0 {
-			years = fullYearsDiff(start, end)
-		}
-		months := fullMonthsDiff(start.AddDate(years, 0, 0), end)
-		diff.Months = years*monthsInYear + months
-		start = start.AddDate(0, diff.Months, 0)
-	}
-
-	if mode&ModeWeeks != 0 {
-		diff.Weeks = fullWeeksDiff(start, end)
-		start = start.AddDate(0, 0, diff.Weeks*daysInWeek)
-	}
-
-	if mode&ModeDays != 0 {
-		diff.Days = fullDaysDiff(start, end)
-	}
-
+	diff := newDiff(start, end, mode)
 	return diff, nil
 }
 
@@ -206,6 +153,38 @@ func (d Diff) String() string {
 // initialization of dates difference. It keeps time units values that are 0.
 func (d Diff) StringWithZeros() string {
 	return formatWithZeros(d, d.rawFormat)
+}
+
+func newDiff(start, end time.Time, mode DiffMode) Diff {
+	diff := Diff{}
+
+	if mode&ModeYears != 0 {
+		diff.Years = fullYearsDiff(start, end)
+		start = start.AddDate(diff.Years, 0, 0)
+	}
+
+	if mode&ModeMonths != 0 {
+		// getting to the closest year to the end date to reduce
+		// amount of the interations during the full month calculation
+		var years int
+		if mode&ModeYears == 0 {
+			years = fullYearsDiff(start, end)
+		}
+		months := fullMonthsDiff(start.AddDate(years, 0, 0), end)
+		diff.Months = years*monthsInYear + months
+		start = start.AddDate(0, diff.Months, 0)
+	}
+
+	if mode&ModeWeeks != 0 {
+		diff.Weeks = fullWeeksDiff(start, end)
+		start = start.AddDate(0, 0, diff.Weeks*daysInWeek)
+	}
+
+	if mode&ModeDays != 0 {
+		diff.Days = fullDaysDiff(start, end)
+	}
+
+	return diff
 }
 
 func fullYearsDiff(start, end time.Time) (years int) {
