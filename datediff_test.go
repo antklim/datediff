@@ -207,7 +207,7 @@ func TestString(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, tC := range testCases {
+	for i, tC := range testCases {
 		desc := fmt.Sprintf("NewDiff(%s, %s, %s)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format)
 		t.Run(desc, func(t *testing.T) {
 			diff, err := datediff.NewDiff(tC.start, tC.end, tC.format)
@@ -220,19 +220,19 @@ func TestString(t *testing.T) {
 			}
 		})
 
-		// if i < customUnitNamesStartIdx {
-		// 	desc := fmt.Sprintf("NewDiffWithMode(%s, %s, %d)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.mode)
-		// 	t.Run(desc, func(t *testing.T) {
-		// 		diff, err := datediff.NewDiffWithMode(tC.start, tC.end, tC.mode)
-		// 		if err != nil {
-		// 			t.Errorf("failed: %v", err)
-		// 		}
-		// 		got := diff.String()
-		// 		if got != tC.print {
-		// 			t.Errorf("String() = %s, want %s", got, tC.print)
-		// 		}
-		// 	})
-		// }
+		if i < customUnitNamesStartIdx {
+			desc := fmt.Sprintf("NewDiffWithMode(%s, %s, %d)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.mode)
+			t.Run(desc, func(t *testing.T) {
+				diff, err := datediff.NewDiffWithMode(tC.start, tC.end, tC.mode)
+				if err != nil {
+					t.Errorf("failed: %v", err)
+				}
+				got := diff.String()
+				if got != tC.print {
+					t.Errorf("String() = %s, want %s", got, tC.print)
+				}
+			})
+		}
 	}
 }
 

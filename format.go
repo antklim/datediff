@@ -65,6 +65,23 @@ func frmt(diff Diff, rawFormat string, replace func(n int, verb, unit string)) {
 	}
 }
 
+func formatMode(d Diff, mode DiffMode) string {
+	var a []string
+	if mode&ModeYears != 0 && d.Years > 0 {
+		a = append(a, formatNoun(d.Years, "year"))
+	}
+	if mode&ModeMonths != 0 && d.Months > 0 {
+		a = append(a, formatNoun(d.Months, "month"))
+	}
+	if mode&ModeWeeks != 0 && d.Weeks > 0 {
+		a = append(a, formatNoun(d.Weeks, "week"))
+	}
+	if mode&ModeDays != 0 && d.Days > 0 {
+		a = append(a, formatNoun(d.Days, "day"))
+	}
+	return strings.Join(a, " ")
+}
+
 // formatNoun takes a positive number n and noun s in singular form.
 // It returns a number and correct form of noun (singular or plural).
 func formatNoun(n int, s string) string {
