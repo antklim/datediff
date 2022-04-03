@@ -257,7 +257,7 @@ func TestStringWithZeros(t *testing.T) {
 
 func TestFormats(t *testing.T) {
 	start := time.Date(2000, time.April, 17, 0, 0, 0, 0, time.UTC)
-	end := start.AddDate(3, -1, -1)
+	end := start.AddDate(3, 0, 0)
 	format := "%Y, %M, %W and %D"
 	diff, err := datediff.NewDiff(start, end, format)
 	if err != nil {
@@ -266,8 +266,8 @@ func TestFormats(t *testing.T) {
 	}
 
 	{
-		format = "%Y"
-		expected := "2 years"
+		format := "%Y %M"
+		expected := "3 years"
 		got, err := diff.Format(format)
 		if err != nil {
 			t.Errorf("Format(%s) failed: %v", format, err)
@@ -277,8 +277,41 @@ func TestFormats(t *testing.T) {
 	}
 
 	{
-		format = "%Y"
-		expected := "2 years"
+		format := "%Y %M"
+		expected := "3 years 0 months"
+		got, err := diff.FormatWithZeros(format)
+		if err != nil {
+			t.Errorf("FormatWithZeros(%s) failed: %v", format, err)
+		} else if got != expected {
+			t.Errorf("FormatWithZeros(%s) = %s, want %s", format, got, expected)
+		}
+	}
+}
+
+func TestFormatsWithMode(t *testing.T) {
+	start := time.Date(2000, time.April, 17, 0, 0, 0, 0, time.UTC)
+	end := start.AddDate(3, 0, 0)
+	mode := datediff.ModeYears | datediff.ModeMonths | datediff.ModeWeeks | datediff.ModeDays
+	diff, err := datediff.NewDiffWithMode(start, end, mode)
+	if err != nil {
+		t.Errorf("NewDiffWithMode(%s, %s, %d) failed: %v",
+			start.Format(dateFmt), end.Format(dateFmt), mode, err)
+	}
+
+	{
+		format := "%Y %M"
+		expected := "3 years"
+		got, err := diff.Format(format)
+		if err != nil {
+			t.Errorf("Format(%s) failed: %v", format, err)
+		} else if got != expected {
+			t.Errorf("Format(%s) = %s, want %s", format, got, expected)
+		}
+	}
+
+	{
+		format := "%Y %M"
+		expected := "3 years 0 months"
 		got, err := diff.FormatWithZeros(format)
 		if err != nil {
 			t.Errorf("FormatWithZeros(%s) failed: %v", format, err)
