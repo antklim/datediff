@@ -152,14 +152,21 @@ func (d Diff) String() string {
 // StringWithZeros formats dates difference according to the format provided at
 // initialization of dates difference. It keeps time units values that are 0.
 func (d Diff) StringWithZeros() string {
-	return formatWithZeros(d, d.rawFormat)
+	return d.formatWithZeros()
 }
 
 func (d Diff) format() string {
 	if d.rawFormat == "" {
-		return formatMode(d, d.mode)
+		return formatMode(d, d.mode, false)
 	}
 	return format(d, d.rawFormat)
+}
+
+func (d Diff) formatWithZeros() string {
+	if d.rawFormat == "" {
+		return formatMode(d, d.mode, true)
+	}
+	return formatWithZeros(d, d.rawFormat)
 }
 
 func newDiff(start, end time.Time, mode DiffMode) Diff {
