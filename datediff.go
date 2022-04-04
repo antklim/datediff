@@ -16,17 +16,17 @@ var (
 	errUndefinedDiffMode = errors.New("undefined dates difference mode")
 )
 
-type diffMode uint8
+type DiffMode uint8
 
 const (
-	modeYears diffMode = 1 << (8 - 1 - iota)
-	modeMonths
-	modeWeeks
-	modeDays
+	ModeYears DiffMode = 1 << (8 - 1 - iota)
+	ModeMonths
+	ModeWeeks
+	ModeDays
 )
 
-func unmarshal(rawFormat string) (diffMode, error) {
-	var mode diffMode
+func unmarshal(rawFormat string) (DiffMode, error) {
+	var mode DiffMode
 	end := len(rawFormat)
 	for i := 0; i < end; {
 		for i < end && rawFormat[i] != '%' {
@@ -40,13 +40,13 @@ func unmarshal(rawFormat string) (diffMode, error) {
 		i++
 		switch c := rawFormat[i]; c {
 		case 'Y', 'y':
-			mode |= modeYears
+			mode |= ModeYears
 		case 'M', 'm':
-			mode |= modeMonths
+			mode |= ModeMonths
 		case 'W', 'w':
-			mode |= modeWeeks
+			mode |= ModeWeeks
 		case 'D', 'd':
-			mode |= modeDays
+			mode |= ModeDays
 		default:
 			return 0, fmt.Errorf("format %q has unknown verb %c", rawFormat, c)
 		}
@@ -66,6 +66,7 @@ type Diff struct {
 	Weeks     int
 	Days      int
 	rawFormat string // initial format, i.e "%Y and %M"
+	mode      DiffMode
 }
 
 // NewDiff creates Diff according to the provided format.
@@ -91,7 +92,8 @@ type Diff struct {
 // NewDiff returns error in the following cases:
 //	start date is after end date
 //	format contains unsupported "verb"
-//	undefined dates difference mode (it happens when the format does not contain any of the supported "verbs")
+//	undefined dates difference mode (it happens when the format does not contain
+//	any of the supported "verbs")
 func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 	if start.After(end) {
 		return Diff{}, errStartIsAfterEnd
@@ -102,34 +104,37 @@ func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 		return Diff{}, err
 	}
 
-	diff := Diff{rawFormat: rawFormat}
+	diff := newDiff(start, end, mode)
+	diff.rawFormat = rawFormat
 
-	if mode&modeYears != 0 {
-		diff.Years = fullYearsDiff(start, end)
-		start = start.AddDate(diff.Years, 0, 0)
+	return diff, nil
+}
+
+// NewDiffWithMode creates Diff according to the provided mode.
+// There are four modes defined:
+//	ModeYears
+//	ModeMonths
+//	ModeWeeks
+//	ModeDays
+//
+// Modes can be combined to support multiple date units. For example:
+//
+//	start, _ := time.Parse("2006-01-02", "2000-04-17")
+//	end, _ := time.Parse("2006-01-02", "2003-03-16")
+//	diff1, _ := NewDiffWithMode(start, end, ModeYears)
+//	diff2, _ := NewDiffWithMode(start, end, ModeMonths)
+//	diff3, _ := NewDiffWithMode(start, end, ModeYears | ModeMonths)
+//	fmt.Println(diff1) // 2 years
+//	fmt.Println(diff2) // 34 month
+//	fmt.Println(diff3) // 2 years 10 months
+//
+// NewDiffWithMode returns error in the following cases:
+//	start date is after end date
+func NewDiffWithMode(start, end time.Time, mode DiffMode) (Diff, error) {
+	if start.After(end) {
+		return Diff{}, errStartIsAfterEnd
 	}
-
-	if mode&modeMonths != 0 {
-		// getting to the closest year to the end date to reduce
-		// amount of the interations during the full month calculation
-		var years int
-		if mode&modeYears == 0 {
-			years = fullYearsDiff(start, end)
-		}
-		months := fullMonthsDiff(start.AddDate(years, 0, 0), end)
-		diff.Months = years*monthsInYear + months
-		start = start.AddDate(0, diff.Months, 0)
-	}
-
-	if mode&modeWeeks != 0 {
-		diff.Weeks = fullWeeksDiff(start, end)
-		start = start.AddDate(0, 0, diff.Weeks*daysInWeek)
-	}
-
-	if mode&modeDays != 0 {
-		diff.Days = fullDaysDiff(start, end)
-	}
-
+	diff := newDiff(start, end, mode)
 	return diff, nil
 }
 
@@ -162,13 +167,55 @@ func (d Diff) FormatWithZeros(rawFormat string) (string, error) {
 // String formats dates difference according to the format provided at
 // initialization of dates difference. Time units that have 0 value omitted.
 func (d Diff) String() string {
-	return format(d, d.rawFormat)
+	return d.format(false)
 }
 
 // StringWithZeros formats dates difference according to the format provided at
 // initialization of dates difference. It keeps time units values that are 0.
 func (d Diff) StringWithZeros() string {
-	return formatWithZeros(d, d.rawFormat)
+	return d.format(true)
+}
+
+func (d Diff) format(withZeros bool) string {
+	if d.rawFormat == "" {
+		return formatMode(d, d.mode, withZeros)
+	}
+	if withZeros {
+		return formatWithZeros(d, d.rawFormat)
+	}
+	return format(d, d.rawFormat)
+}
+
+func newDiff(start, end time.Time, mode DiffMode) Diff {
+	diff := Diff{mode: mode}
+
+	if mode&ModeYears != 0 {
+		diff.Years = fullYearsDiff(start, end)
+		start = start.AddDate(diff.Years, 0, 0)
+	}
+
+	if mode&ModeMonths != 0 {
+		// getting to the closest year to the end date to reduce
+		// amount of the interations during the full month calculation
+		var years int
+		if mode&ModeYears == 0 {
+			years = fullYearsDiff(start, end)
+		}
+		months := fullMonthsDiff(start.AddDate(years, 0, 0), end)
+		diff.Months = years*monthsInYear + months
+		start = start.AddDate(0, diff.Months, 0)
+	}
+
+	if mode&ModeWeeks != 0 {
+		diff.Weeks = fullWeeksDiff(start, end)
+		start = start.AddDate(0, 0, diff.Weeks*daysInWeek)
+	}
+
+	if mode&ModeDays != 0 {
+		diff.Days = fullDaysDiff(start, end)
+	}
+
+	return diff
 }
 
 func fullYearsDiff(start, end time.Time) (years int) {

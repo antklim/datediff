@@ -2,6 +2,7 @@ package datediff_test
 
 import (
 	"encoding/csv"
+	"fmt"
 	"os"
 	"strconv"
 	"testing"
@@ -11,11 +12,13 @@ import (
 )
 
 const dateFmt = "2006-01-02"
+const customUnitNamesStartIdx = 31
 
 // these are the fields of testdata/dates.csv
 const (
 	startFld = iota
 	endFld
+	modeFld
 	formatFld
 	yearsFld
 	monthsFld
@@ -28,6 +31,7 @@ const (
 type datediffRecord struct {
 	start          time.Time
 	end            time.Time
+	mode           datediff.DiffMode
 	format         string
 	diff           datediff.Diff
 	print          string
@@ -40,6 +44,10 @@ func loadDatediffRecord(r []string) (datediffRecord, error) {
 		return datediffRecord{}, err
 	}
 	end, err := time.Parse(dateFmt, r[endFld])
+	if err != nil {
+		return datediffRecord{}, err
+	}
+	mode, err := strconv.Atoi(r[modeFld])
 	if err != nil {
 		return datediffRecord{}, err
 	}
@@ -63,6 +71,7 @@ func loadDatediffRecord(r []string) (datediffRecord, error) {
 	return datediffRecord{
 		start:          start,
 		end:            end,
+		mode:           datediff.DiffMode(mode),
 		format:         r[formatFld],
 		diff:           datediff.Diff{Years: years, Months: months, Weeks: weeks, Days: days},
 		print:          r[printFld],
@@ -118,16 +127,26 @@ func TestNewDiff(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	for _, tC := range testCases {
-		got, err := datediff.NewDiff(tC.start, tC.end, tC.format)
-		if err != nil {
-			t.Errorf("NewDiff(%s, %s, %s) failed: %v",
-				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, err)
-		} else if !got.Equal(tC.diff) {
-			t.Errorf("NewDiff(%s, %s, %s) = %v, want %#v",
-				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, got, tC.diff)
-		}
+		desc := fmt.Sprintf("NewDiff(%s, %s, %s)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format)
+		t.Run(desc, func(t *testing.T) {
+			got, err := datediff.NewDiff(tC.start, tC.end, tC.format)
+			if err != nil {
+				t.Errorf("failed: %v", err)
+			} else if !got.Equal(tC.diff) {
+				t.Errorf("got %#v, want %#v", got, tC.diff)
+			}
+		})
+
+		desc = fmt.Sprintf("NewDiffWithMode(%s, %s, %d)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.mode)
+		t.Run(desc, func(t *testing.T) {
+			got, err := datediff.NewDiffWithMode(tC.start, tC.end, tC.mode)
+			if err != nil {
+				t.Errorf("failed: %v", err)
+			} else if !got.Equal(tC.diff) {
+				t.Errorf("got %#v, want %#v", got, tC.diff)
+			}
+		})
 	}
 }
 
@@ -158,12 +177,27 @@ func TestNewDiffFails(t *testing.T) {
 	for _, tC := range testCases {
 		got, err := datediff.NewDiff(tC.start, tC.end, tC.format)
 		if err == nil {
-			t.Errorf("NewDiff(%s, %s, %s) = %v, want to fail due to %s",
+			t.Errorf("NewDiff(%s, %s, %s) = %#v, want to fail due to %s",
 				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, got, tC.expected)
 		} else if err.Error() != tC.expected {
 			t.Errorf("NewDiff(%s, %s, %s) failed: %v, want to fail due to %s",
 				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, err, tC.expected)
 		}
+	}
+}
+
+func TestNewDiffWithModeFails(t *testing.T) {
+	start := time.Now().Add(time.Hour)
+	end := time.Now()
+	mode := datediff.ModeYears
+	expected := "start date is after end date"
+	got, err := datediff.NewDiffWithMode(start, end, mode)
+	if err == nil {
+		t.Errorf("NewDiffWithMode(%s, %s, %d) = %#v, want to fail due to %s",
+			start.Format(dateFmt), end.Format(dateFmt), mode, got, expected)
+	} else if err.Error() != expected {
+		t.Errorf("NewDiffWithMode(%s, %s, %d) failed: %v, want to fail due to %s",
+			start.Format(dateFmt), end.Format(dateFmt), mode, err, expected)
 	}
 }
 
@@ -173,15 +207,31 @@ func TestString(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, tC := range testCases {
-		diff, err := datediff.NewDiff(tC.start, tC.end, tC.format)
-		if err != nil {
-			t.Errorf("NewDiff(%s, %s, %s) failed: %v",
-				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, err)
-		}
-		got := diff.String()
-		if got != tC.print {
-			t.Errorf("String() = %s, want %s", got, tC.print)
+	for i, tC := range testCases {
+		desc := fmt.Sprintf("NewDiff(%s, %s, %s)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format)
+		t.Run(desc, func(t *testing.T) {
+			diff, err := datediff.NewDiff(tC.start, tC.end, tC.format)
+			if err != nil {
+				t.Errorf("failed: %v", err)
+			}
+			got := diff.String()
+			if got != tC.print {
+				t.Errorf("String() = %s, want %s", got, tC.print)
+			}
+		})
+
+		if i < customUnitNamesStartIdx {
+			desc := fmt.Sprintf("NewDiffWithMode(%s, %s, %d)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.mode)
+			t.Run(desc, func(t *testing.T) {
+				diff, err := datediff.NewDiffWithMode(tC.start, tC.end, tC.mode)
+				if err != nil {
+					t.Errorf("failed: %v", err)
+				}
+				got := diff.String()
+				if got != tC.print {
+					t.Errorf("String() = %s, want %s", got, tC.print)
+				}
+			})
 		}
 	}
 }
@@ -192,22 +242,38 @@ func TestStringWithZeros(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, tC := range testCases {
-		diff, err := datediff.NewDiff(tC.start, tC.end, tC.format)
-		if err != nil {
-			t.Errorf("NewDiff(%s, %s, %s) failed: %v",
-				tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format, err)
-		}
-		got := diff.StringWithZeros()
-		if got != tC.printWithZeros {
-			t.Errorf("StringWithZeros() = %s, want %s", got, tC.printWithZeros)
+	for i, tC := range testCases {
+		desc := fmt.Sprintf("NewDiff(%s, %s, %s)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.format)
+		t.Run(desc, func(t *testing.T) {
+			diff, err := datediff.NewDiff(tC.start, tC.end, tC.format)
+			if err != nil {
+				t.Errorf("failed: %v", err)
+			}
+			got := diff.StringWithZeros()
+			if got != tC.printWithZeros {
+				t.Errorf("StringWithZeros() = %s, want %s", got, tC.printWithZeros)
+			}
+		})
+
+		if i < customUnitNamesStartIdx {
+			desc := fmt.Sprintf("NewDiffWithMode(%s, %s, %d)", tC.start.Format(dateFmt), tC.end.Format(dateFmt), tC.mode)
+			t.Run(desc, func(t *testing.T) {
+				diff, err := datediff.NewDiffWithMode(tC.start, tC.end, tC.mode)
+				if err != nil {
+					t.Errorf("failed: %v", err)
+				}
+				got := diff.StringWithZeros()
+				if got != tC.printWithZeros {
+					t.Errorf("StringWithZeros() = %s, want %s", got, tC.printWithZeros)
+				}
+			})
 		}
 	}
 }
 
 func TestFormats(t *testing.T) {
 	start := time.Date(2000, time.April, 17, 0, 0, 0, 0, time.UTC)
-	end := start.AddDate(3, -1, -1)
+	end := start.AddDate(3, 0, 0)
 	format := "%Y, %M, %W and %D"
 	diff, err := datediff.NewDiff(start, end, format)
 	if err != nil {
@@ -216,8 +282,8 @@ func TestFormats(t *testing.T) {
 	}
 
 	{
-		format = "%Y"
-		expected := "2 years"
+		format := "%Y %M"
+		expected := "3 years"
 		got, err := diff.Format(format)
 		if err != nil {
 			t.Errorf("Format(%s) failed: %v", format, err)
@@ -227,8 +293,41 @@ func TestFormats(t *testing.T) {
 	}
 
 	{
-		format = "%Y"
-		expected := "2 years"
+		format := "%Y %M"
+		expected := "3 years 0 months"
+		got, err := diff.FormatWithZeros(format)
+		if err != nil {
+			t.Errorf("FormatWithZeros(%s) failed: %v", format, err)
+		} else if got != expected {
+			t.Errorf("FormatWithZeros(%s) = %s, want %s", format, got, expected)
+		}
+	}
+}
+
+func TestFormatsWithMode(t *testing.T) {
+	start := time.Date(2000, time.April, 17, 0, 0, 0, 0, time.UTC)
+	end := start.AddDate(3, 0, 0)
+	mode := datediff.ModeYears | datediff.ModeMonths | datediff.ModeWeeks | datediff.ModeDays
+	diff, err := datediff.NewDiffWithMode(start, end, mode)
+	if err != nil {
+		t.Errorf("NewDiffWithMode(%s, %s, %d) failed: %v",
+			start.Format(dateFmt), end.Format(dateFmt), mode, err)
+	}
+
+	{
+		format := "%Y %M"
+		expected := "3 years"
+		got, err := diff.Format(format)
+		if err != nil {
+			t.Errorf("Format(%s) failed: %v", format, err)
+		} else if got != expected {
+			t.Errorf("Format(%s) = %s, want %s", format, got, expected)
+		}
+	}
+
+	{
+		format := "%Y %M"
+		expected := "3 years 0 months"
 		got, err := diff.FormatWithZeros(format)
 		if err != nil {
 			t.Errorf("FormatWithZeros(%s) failed: %v", format, err)

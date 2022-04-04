@@ -55,18 +55,33 @@ func ExampleDiff_String() {
 	d1, _ := time.Parse("2006-01-02", "2000-10-01")
 	d2, _ := time.Parse("2006-01-02", "2010-11-30")
 
-	diff1, _ := datediff.NewDiff(d1, d2, "%Y")
-	diff2, _ := datediff.NewDiff(d1, d2, "%Y %M")
-	diff3, _ := datediff.NewDiff(d1, d2, "%Y %M %D")
+	{
+		diff1, _ := datediff.NewDiff(d1, d2, "%Y")
+		diff2, _ := datediff.NewDiff(d1, d2, "%Y %M")
+		diff3, _ := datediff.NewDiff(d1, d2, "%Y %M %D")
 
-	fmt.Println(diff1)
-	fmt.Println(diff2)
-	fmt.Println(diff3)
+		fmt.Println(diff1)
+		fmt.Println(diff2)
+		fmt.Println(diff3)
+	}
+
+	{
+		diff1, _ := datediff.NewDiffWithMode(d1, d2, datediff.ModeYears)
+		diff2, _ := datediff.NewDiffWithMode(d1, d2, datediff.ModeYears|datediff.ModeMonths)
+		diff3, _ := datediff.NewDiffWithMode(d1, d2, datediff.ModeYears|datediff.ModeMonths|datediff.ModeWeeks)
+
+		fmt.Println(diff1)
+		fmt.Println(diff2)
+		fmt.Println(diff3)
+	}
 
 	// Output:
 	// 10 years
 	// 10 years 1 month
 	// 10 years 1 month 29 days
+	// 10 years
+	// 10 years 1 month
+	// 10 years 1 month 4 weeks
 }
 
 func ExampleDiff_StringWithZeros() {
