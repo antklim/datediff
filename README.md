@@ -20,8 +20,8 @@ import(
 func main() {
   dateOfBirth, _ := time.Parse("2006-01-02", "2000-10-01")
   today, _ := time.Parse("2006-01-02", "2010-11-30")
-  age, _ := datediff.NewDiff(dateOfBirth, today, "%Y %M %D old")
-  fmt.Printf("Today I'm %s", age)
+  age, _ := datediff.NewDiff(dateOfBirth, today, "%Y %M %D")
+  fmt.Printf("Today I'm %s old", age)
 
   // Output:
   // Today I'm 10 years 1 month 29 days old
