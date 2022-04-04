@@ -92,7 +92,8 @@ type Diff struct {
 // NewDiff returns error in the following cases:
 //	start date is after end date
 //	format contains unsupported "verb"
-//	undefined dates difference mode (it happens when the format does not contain any of the supported "verbs")
+//	undefined dates difference mode (it happens when the format does not contain
+//	any of the supported "verbs")
 func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 	if start.After(end) {
 		return Diff{}, errStartIsAfterEnd
@@ -109,6 +110,26 @@ func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 	return diff, nil
 }
 
+// NewDiffWithMode creates Diff according to the provided mode.
+// There are four modes defined:
+//	ModeYears
+//	ModeMonths
+//	ModeWeeks
+//	ModeDays
+//
+// Modes can be combined to support multiple date units. For example:
+//
+//	start, _ := time.Parse("2006-01-02", "2000-04-17")
+//	end, _ := time.Parse("2006-01-02", "2003-03-16")
+//	diff1, _ := NewDiffWithMode(start, end, ModeYears)
+//	diff2, _ := NewDiffWithMode(start, end, ModeMonths)
+//	diff3, _ := NewDiffWithMode(start, end, ModeYears | ModeMonths)
+//	fmt.Println(diff1) // 2 years
+//	fmt.Println(diff2) // 34 month
+//	fmt.Println(diff3) // 2 years 10 months
+//
+// NewDiffWithMode returns error in the following cases:
+//	start date is after end date
 func NewDiffWithMode(start, end time.Time, mode DiffMode) (Diff, error) {
 	if start.After(end) {
 		return Diff{}, errStartIsAfterEnd
