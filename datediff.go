@@ -92,8 +92,7 @@ type Diff struct {
 // NewDiff returns error in the following cases:
 //	start date is after end date
 //	format contains unsupported "verb"
-//	undefined dates difference mode (it happens when the format does not contain
-//	any of the supported "verbs")
+//	undefined dates difference mode (it happens when the format does not contain any of the supported "verbs")
 func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 	if start.After(end) {
 		return Diff{}, errStartIsAfterEnd
