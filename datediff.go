@@ -71,13 +71,14 @@ type Diff struct {
 
 // NewDiff creates Diff according to the provided format.
 // Provided format should contain special "verbs" that define dates difference
-// calculattion logic. These are supported format verbs:
+// calculation logic. These are supported format verbs:
+//
 //	%Y - to calculate dates difference in years
 //	%M - to calculate dates difference in months
 //	%W - to calculate dates difference in weeks
 //	%D - to calculate dates difference in days
 //
-// When format contains multiple "verbs" the date diffrence will be calculated
+// When format contains multiple "verbs" the date difference will be calculated
 // starting from longest time unit to shortest. For example:
 //
 //	start, _ := time.Parse("2006-01-02", "2000-04-17")
@@ -90,6 +91,7 @@ type Diff struct {
 //	fmt.Println(diff3) // 2 years 10 months
 //
 // NewDiff returns error in the following cases:
+//
 //	start date is after end date
 //	format contains unsupported "verb"
 //	undefined dates difference mode (it happens when the format does not contain any of the supported "verbs")
@@ -111,6 +113,7 @@ func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 
 // NewDiffWithMode creates Diff according to the provided mode.
 // There are four modes defined:
+//
 //	ModeYears
 //	ModeMonths
 //	ModeWeeks
@@ -128,6 +131,7 @@ func NewDiff(start, end time.Time, rawFormat string) (Diff, error) {
 //	fmt.Println(diff3) // 2 years 10 months
 //
 // NewDiffWithMode returns error in the following cases:
+//
 //	start date is after end date
 func NewDiffWithMode(start, end time.Time, mode DiffMode) (Diff, error) {
 	if start.After(end) {
